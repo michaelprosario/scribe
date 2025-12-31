@@ -1,0 +1,82 @@
+## Amended Plan for MP3 Transcription & Summary CLI Tool (Using Whisper)
+
+### Architecture Overview
+1. **Input Handler**: Accept MP3 file path via CLI argument
+2. **Transcription Module**: Convert MP3 to text using **OpenAI Whisper (local)**
+3. **Text Processing**: Clean and format the transcribed text
+4. **AI Summary Module**: Use Gemini API to generate conversation summary and action items
+5. **Output Module**: Display results and optionally save to file
+
+### Technology Stack
+- **CLI Framework**: `argparse` (built-in)
+- **Audio Transcription**: **`openai-whisper`** (local processing, completely free)
+  - Model options: `tiny`, `base`, `small`, `medium`, `large` (trade-off: speed vs accuracy)
+  - Recommended: `base` model for balance of speed and accuracy
+- **Audio Processing**: Whisper handles MP3 directly (no conversion needed!)
+- **AI Integration**: Google Gemini API via `google-generativeai` library
+- **Output**: Console output + optional file export
+
+### File Structure
+```
+mp3-transcriber/
+├── transcriber.py          # Main CLI entry point
+├── transcription.py        # Whisper transcription logic
+├── summarizer.py          # Gemini API integration
+├── utils.py               # Helper functions (file I/O, formatting)
+├── requirements.txt       # Dependencies
+├── .env.example          # Environment variables template
+└── README.md             # Usage instructions
+```
+
+### Key Features
+1. Accept MP3 file path as CLI argument
+2. **Use Whisper to transcribe MP3 directly** (no conversion needed)
+3. Choose Whisper model size via CLI flag (default: `base`)
+4. Display transcription progress
+5. Send transcribed text to Gemini for:
+   - Conversation summary
+   - Action items extraction
+6. Output formatted results to console
+7. Optional: Save to text/JSON/Markdown file
+
+### Dependencies
+```
+openai-whisper          # Local transcription engine
+google-generativeai     # Gemini API client
+python-dotenv          # Environment variables
+torch                  # Required by Whisper (PyTorch)
+```
+
+### Whisper Model Selection
+- **tiny**: Fastest, least accurate (~1GB RAM)
+- **base**: Good balance (default) (~1GB RAM)
+- **small**: Better accuracy (~2GB RAM)
+- **medium**: High accuracy (~5GB RAM)
+- **large**: Best accuracy, slowest (~10GB RAM)
+
+### CLI Arguments
+```bash
+python transcriber.py <mp3_file> [options]
+
+Options:
+  --model       Whisper model size (tiny/base/small/medium/large)
+  --output      Save output to file (txt/json/md)
+  --no-summary  Skip Gemini summary (transcription only)
+```
+
+### Workflow
+1. Load Whisper model (cached after first run)
+2. Transcribe MP3 file
+3. Display raw transcription
+4. Send to Gemini API for summary + action items
+5. Display formatted summary
+6. Optionally save all outputs to file
+
+### Cost/Resource Considerations
+- **Transcription**: 100% free, runs locally on CPU/GPU
+- **First run**: Downloads Whisper model (~100MB-3GB depending on size)
+- **Processing time**: 
+  - `base` model: ~1x real-time (10min audio = ~10min processing on CPU)
+  - Faster with GPU if available
+- **Gemini API**: Free tier (60 requests/minute, generous limits)
+
