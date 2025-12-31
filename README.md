@@ -2,6 +2,24 @@
 
 A clean architecture CLI application that transcribes audio files using OpenAI Whisper (local processing) and generates summaries with action items using Google Gemini API.
 
+## Quick Start
+
+```bash
+# 1. Install ffmpeg (REQUIRED - see Installation section)
+sudo apt-get install -y ffmpeg  # Ubuntu/Debian
+# OR: brew install ffmpeg        # macOS
+
+# 2. Install Python dependencies
+pip install -r requirements.txt
+
+# 3. Set up Gemini API key
+cp .env.example .env
+# Edit .env and add your GEMINI_API_KEY
+
+# 4. Run transcription
+python transcriber.py your_audio.mp3
+```
+
 ## Features
 
 - 🎙️ **Local Transcription**: Uses OpenAI Whisper for 100% free, local audio transcription
@@ -42,6 +60,7 @@ src/
 
 - Python 3.8 or higher
 - pip
+- **ffmpeg** (required by Whisper for audio processing)
 - (Optional) GPU for faster transcription
 
 ### Setup
@@ -52,18 +71,30 @@ git clone https://github.com/michaelprosario/scribe.git
 cd scribe
 ```
 
-2. Install dependencies:
+2. **Install ffmpeg** (required):
+```bash
+# Ubuntu/Debian
+sudo apt-get update && sudo apt-get install -y ffmpeg
+
+# macOS
+brew install ffmpeg
+
+# Windows
+# Download from https://ffmpeg.org/download.html
+```
+
+3. Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Configure environment variables:
+4. Configure environment variables:
 ```bash
 cp .env.example .env
 # Edit .env and add your Gemini API key
 ```
 
-4. Get your Gemini API key from: https://makersuite.google.com/app/apikey
+5. Get your Gemini API key from: https://makersuite.google.com/app/apikey
 
 ## Usage
 
@@ -163,14 +194,47 @@ scribe/
 
 ### Transcription (Whisper)
 - **Cost**: 100% FREE (runs locally)
-- **First run**: Downloads model (~100MB-3GB depending on size)
+- **First run**: Downloads model (~72MB for tiny, ~140MB for base, up to ~3GB for large)
 - **Processing time**: 
-  - `base` model: ~1x real-time (10min audio = ~10min processing on CPU)
+  - `tiny` model: ~0.5-1x real-time (10min audio = ~5-10min processing on CPU)
+  - `base` model: ~1-2x real-time (10min audio = ~10-20min processing on CPU)
   - Faster with GPU if available
+- **Note**: Progress bar shown during model download and transcription
 
 ### Summarization (Gemini)
 - **Cost**: Free tier available (60 requests/minute)
 - **Processing time**: Usually < 5 seconds
+
+## Troubleshooting
+
+### "No such file or directory: 'ffmpeg'"
+**Solution**: Install ffmpeg before running the transcriber:
+```bash
+# Ubuntu/Debian
+sudo apt-get install -y ffmpeg
+
+# macOS
+brew install ffmpeg
+
+# Windows - Download from https://ffmpeg.org/download.html
+```
+
+### "Gemini API key not provided"
+**Solution**: Create a `.env` file with your API key:
+```bash
+cp .env.example .env
+# Edit .env and add: GEMINI_API_KEY=your_actual_key_here
+```
+
+### "Audio file not found"
+**Solution**: Use absolute path or verify file exists:
+```bash
+ls -l audio.mp3
+python transcriber.py $(pwd)/audio.mp3
+```
+
+### "FP16 is not supported on CPU; using FP32 instead"
+This is just a warning (not an error). Whisper automatically uses FP32 on CPU. You can safely ignore this message.
 
 ## Contributing
 

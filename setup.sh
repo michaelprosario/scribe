@@ -5,6 +5,27 @@ echo "Setting up Scribe - MP3 Transcription & Summary Tool"
 echo "======================================================"
 echo ""
 
+# Check for ffmpeg
+echo "Checking for ffmpeg..."
+if ! command -v ffmpeg &> /dev/null; then
+    echo "⚠️  WARNING: ffmpeg is not installed (required by Whisper)"
+    echo ""
+    echo "Please install ffmpeg:"
+    echo "  Ubuntu/Debian: sudo apt-get install -y ffmpeg"
+    echo "  macOS:         brew install ffmpeg"
+    echo "  Windows:       Download from https://ffmpeg.org/download.html"
+    echo ""
+    read -p "Continue setup anyway? [y/N]: " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Setup cancelled. Please install ffmpeg and try again."
+        exit 1
+    fi
+else
+    echo "✓ ffmpeg found: $(ffmpeg -version | head -n1)"
+fi
+echo ""
+
 # Check Python version
 echo "Checking Python version..."
 python3 --version

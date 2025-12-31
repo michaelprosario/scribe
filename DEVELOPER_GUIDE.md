@@ -21,12 +21,21 @@ python transcriber.py audio.mp3 --output results.json
 
 ## Development Setup
 
-1. Install dependencies:
+1. Install system dependencies:
+```bash
+# Ubuntu/Debian
+sudo apt-get update && sudo apt-get install -y ffmpeg
+
+# macOS
+brew install ffmpeg
+```
+
+2. Install Python dependencies:
 ```bash
 pip install -r requirements.txt
 ```
 
-2. Set up environment:
+3. Set up environment:
 ```bash
 cp .env.example .env
 # Edit .env and add your GEMINI_API_KEY
