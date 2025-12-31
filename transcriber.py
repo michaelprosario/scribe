@@ -39,8 +39,8 @@ Examples:
     parser.add_argument(
         "--model",
         choices=["tiny", "base", "small", "medium", "large"],
-        default="base",
-        help="Whisper model size (default: base)"
+        default="tiny",
+        help="Whisper model size (default: tiny)"
     )
     
     parser.add_argument(

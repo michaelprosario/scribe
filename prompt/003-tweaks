@@ -1,0 +1,5 @@
+please make the following changes to the program
+- default the system to use tiny whisper 
+- update the gemini provider to google.genai package 
+- write the raw whisper transcript to transcript.txt
+- write the gemini content to ai_summary.txt

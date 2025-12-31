@@ -38,8 +38,8 @@ class WhisperTranscriptionProvider(ITranscriptionProvider):
                     errors=["Missing dependency: openai-whisper"]
                 )
             
-            # Default to base model
-            model_name = model or "base"
+            # Default to tiny model
+            model_name = model or "tiny"
             
             # Load model (cache it for reuse)
             if model_name not in self._model_cache:

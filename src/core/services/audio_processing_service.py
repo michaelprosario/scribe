@@ -58,6 +58,14 @@ class AudioProcessingService:
         
         transcription = transcription_result.value
         
+        # Write raw transcript to file
+        try:
+            with open("transcript.txt", "w", encoding="utf-8") as f:
+                f.write(transcription.text)
+        except Exception as e:
+            # Log error but don't fail the entire process
+            pass
+        
         # Step 2: Generate summary (if not skipped)
         if command.skip_summary:
             # Return transcription with empty summary
@@ -79,6 +87,18 @@ class AudioProcessingService:
                 f"Summarization failed: {summary_result.message}",
                 errors=summary_result.errors
             )
+        
+        # Write gemini summary to file
+        try:
+            with open("ai_summary.txt", "w", encoding="utf-8") as f:
+                summary = summary_result.value
+                f.write(f"SUMMARY:\n{summary.conversation_summary}\n\n")
+                f.write("ACTION ITEMS:\n")
+                for item in summary.action_items:
+                    f.write(f"- {item}\n")
+        except Exception as e:
+            # Log error but don't fail the entire process
+            pass
         
         return AppResult.ok(
             (transcription, summary_result.value),

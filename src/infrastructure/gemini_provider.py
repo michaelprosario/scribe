@@ -17,11 +17,11 @@ class GeminiSummarizationProvider(ISummarizationProvider):
             api_key: Gemini API key. If None, will try to load from GEMINI_API_KEY env variable
         """
         self._api_key = api_key or os.getenv("GEMINI_API_KEY")
-        self._model = None
+        self._client = None
     
     def _initialize_model(self):
-        """Initialize the Gemini model (lazy loading)."""
-        if self._model is not None:
+        """Initialize the Gemini client (lazy loading)."""
+        if self._client is not None:
             return AppResult.ok(None)
         
         if not self._api_key:
@@ -31,20 +31,19 @@ class GeminiSummarizationProvider(ISummarizationProvider):
             )
         
         try:
-            import google.generativeai as genai
+            import google.genai as genai
         except ImportError:
             return AppResult.fail(
-                "Google Generative AI library is not installed. Please install with: pip install google-generativeai",
-                errors=["Missing dependency: google-generativeai"]
+                "Google GenAI library is not installed. Please install with: pip install google-genai",
+                errors=["Missing dependency: google-genai"]
             )
         
         try:
-            genai.configure(api_key=self._api_key)
-            self._model = genai.GenerativeModel('gemini-pro')
+            self._client = genai.Client(api_key=self._api_key)
             return AppResult.ok(None)
         except Exception as e:
             return AppResult.fail(
-                f"Failed to initialize Gemini model: {str(e)}",
+                f"Failed to initialize Gemini client: {str(e)}",
                 errors=[str(e)]
             )
     
@@ -59,7 +58,7 @@ class GeminiSummarizationProvider(ISummarizationProvider):
             AppResult containing Summary or error details
         """
         try:
-            # Initialize model if needed
+            # Initialize client if needed
             init_result = self._initialize_model()
             if not init_result.success:
                 return init_result
@@ -85,8 +84,11 @@ Transcription:
 {text}
 """
             
-            # Generate response
-            response = self._model.generate_content(prompt)
+            # Generate response using the client
+            response = self._client.models.generate_content(
+                model='gemini-2.0-flash-exp',
+                contents=prompt
+            )
             
             if not response or not response.text:
                 return AppResult.fail("Gemini API returned empty response")
